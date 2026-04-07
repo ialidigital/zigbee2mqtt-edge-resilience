@@ -5,7 +5,7 @@
 
 A robust state-management extension for Zigbee2MQTT (Z2M). This module is engineered to provide **Edge Resilience** for hardware that suffers from "Ghost Updates," "Micro-Brownouts," and unreliable power-on behavior—specifically targeting **Aurora AOne (mPro)** no-neutral dimmers.
 
-This was built primarily for Aurora Zigbee Rotary Dimmers, but is in theory applicable to any master/slave dimmer setup in a Z2M mesh network.
+This was built primarily for Aurora (AU-A1ZB2WDM) Zigbee Rotary Dimmers, but is in theory applicable to any master/slave dimmer setup in a Z2M mesh network.
 
 **The result is that you get a hardware-like user experience with the dimmers.**
 
