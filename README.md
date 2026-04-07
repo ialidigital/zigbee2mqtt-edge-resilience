@@ -37,10 +37,25 @@ The extension operates as a middleware layer within the Zigbee2MQTT lifecycle:
 - Zigbee2MQTT 1.30.0 or higher.
 - Access to the Z2M `data` directory.
 
-### Setup
-1.  Create a folder named `external_extensions` in your Z2M data directory (if it doesn't exist).
-2.  Clone this repository or copy `edge-resilience.mjs` into that folder.
-3.  Add the extension to your `configuration.yaml`:
+### Setup in Z2M Console (Recommended)
+1. Go to Z2M Console > Settings > Dev Console > External Extensions
+2. Select 'Create New Extension'.
+3. Give it the name `edge-resilience.js`
+4. In the editor delete the default extension content and copy paste the entire content of dist/edge-resilience.js.
+5. Press Save button.
+6. Watch the Z2M console logs for success message.
+7. It is now loaded
+
+### Manual Setup
+1.  Create a folder named `external_extensions` in your Z2M data directory (if it doesn't exist) `zigbee2mqtt\data\external_extensions`
+2.  Clone this repository or copy `edge-resilience.js` into that folder.
+
+```yaml
+external_extensions:
+  - edge-resilience.js
+```
+3. Stop zigbee2mqtt service, ensure it has completely stoppped.
+4. Start zigbee2mqtt service. (This ensures all Z2M extensions are loaded).
 
 ## 5. Collaborative Credits
 Co-Authors:
@@ -50,7 +65,3 @@ Imran Ali ([LinkedIn](https://www.linkedin.com/in/imranali)) - Navigator & Quali
 Gemini (Google AI) - Driver & Implementation Specialist
 
 This project serves as a proving ground to encourage other engineers to leverage AI for complex systems-level problem solving.
-
-```yaml
-external_extensions:
-  - edge-resilience.mjs
