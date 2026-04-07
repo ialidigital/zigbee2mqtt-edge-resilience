@@ -5,6 +5,10 @@
 
 A robust state-management extension for Zigbee2MQTT (Z2M). This module is engineered to provide **Edge Resilience** for hardware that suffers from "Ghost Updates," "Micro-Brownouts," and unreliable power-on behavior—specifically targeting **Aurora AOne (mPro)** no-neutral dimmers.
 
+This was built primarily for Aurora Zigbee Rotary Dimmers, but is in theory applicable to any master/slave dimmer setup in a Z2M mesh network.
+
+**The result is that you get a hardware-like user experience with the dimmers.**
+
 ## 0. Introduction: The XP Experiment
 This repository is the result of an Extreme Programming (XP) experiment between Imran Ali (Lead Engineer | Ex-Sky, BBC iPlayer) and Gemini (AI Pair Programmer). Our goal was to explore the boundaries of AI-human collaboration on "messy" real-world hardware problems.
 
