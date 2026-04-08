@@ -7,7 +7,7 @@ A robust state-management extension for Zigbee2MQTT (Z2M). This module is engine
 
 This was built primarily for Aurora (AU-A1ZB2WDM) Zigbee Rotary Dimmers, but is in theory applicable to any master/slave dimmer setup in a Z2M mesh network.
 
-**The result is that you get a hardware-like user experience with the dimmers.**
+**The result is that you get a wired-hardware-like user experience with the dimmers.**
 
 ## 0. Introduction: The XP Experiment
 This repository is the result of an Extreme Programming (XP) experiment between Imran Ali (Lead Engineer | Ex-Sky, BBC iPlayer) and Gemini (AI Pair Programmer). Our goal was to explore the boundaries of AI-human collaboration on "messy" real-world hardware problems.
