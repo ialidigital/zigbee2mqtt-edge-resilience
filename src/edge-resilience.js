@@ -93,8 +93,15 @@ loadConfig() {
                         const prevVal = this.lastBrightness[sourceName] || val;
                         const delta = Math.abs(val - prevVal);
 
+<<<<<<< develop
+                        // GHOST PROTECTION: Block no-neutral "Reboot to 128" glitches
+                        if (val === 128 && delta > 10 && prevVal !== 128) {
+                            // CRITICAL: We do NOT send a command back to the slave here. 
+                            // We just update our memory so the Master doesn't move.
+=======
                         // GHOST PROTECTION
                         if (val === 128 && delta > 10 && prevVal !== 128) {
+>>>>>>> main
                             this.logger.info(`EdgeResilience: Ghost detected on ${sourceName}. Maintaining ${prevVal}.`);
                             this.lastBrightness[sourceName] = prevVal; 
                             return;
