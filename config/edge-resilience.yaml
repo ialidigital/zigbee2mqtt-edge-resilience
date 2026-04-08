@@ -1,0 +1,8 @@
+# zigbee2mqtt-edge-resilience configuration
+mappings:
+  - master: "Landing Lights"
+    slave: "Landing Slave"
+    max_brightness: 230
+  - master: "Lounge Lights"
+    slave: "Lounge Slave"
+    max_brightness: 254

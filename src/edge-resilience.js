@@ -1,3 +1,7 @@
+const fs = require('fs');
+const path = require('path');
+const yaml = require('js-yaml');
+
 class EdgeResilience {
     constructor(zigbee, mqtt, state, publishEntityState, eventBus, enableDisableExtension, restartCallback, addExtension, settings, logger) {
         this.zigbee = zigbee;
@@ -6,14 +10,45 @@ class EdgeResilience {
         this.logger = logger;
         this.lastBrightness = {}; 
         this.isInitializing = {}; 
-        this.syncMap = {
-            'Landing Slave': 'Landing Lights',
-            'Lounge Slave': 'Lounge Lights'
-        };
+        this.syncMap = {};
+        this.limits = {};
+
+        this.loadConfig();
+    }
+
+loadConfig() {
+        try {
+            // We jump up one level from 'external_extensions' to 'data'
+            const configPath = path.join(__dirname, '..', 'edge-resilience.yaml');
+            
+            this.logger.info(`EdgeResilience: Looking for config in Z2M data root: ${configPath}`);
+
+            if (fs.existsSync(configPath)) {
+                const fileContent = fs.readFileSync(configPath, 'utf8');
+                const doc = yaml.load(fileContent);
+                
+                if (doc && doc.mappings) {
+                    this.syncMap = {}; 
+                    this.limits = {};
+                    
+                    doc.mappings.forEach(map => {
+                        this.syncMap[map.slave] = map.master;
+                        if (map.max_brightness) {
+                            this.limits[map.slave] = map.max_brightness;
+                        }
+                    });
+                    this.logger.info(`EdgeResilience: Successfully loaded ${doc.mappings.length} mappings from data root.`);
+                }
+            } else {
+                this.logger.error(`EdgeResilience: edge-resilience.yaml NOT found at ${configPath}`);
+            }
+        } catch (e) {
+            this.logger.error(`EdgeResilience: YAML Parse Error: ${e.message}`);
+        }
     }
 
     async start() {
-        this.logger.info('EdgeResilience: Gold Master V4 (Ghost-Proof) Active');
+        this.logger.info('EdgeResilience: Gold Master V5 (Config-Driven) Active');
 
         this.eventBus.onStateChange(this, async (data) => {
             if (!data || !data.entity || !data.update) return;
@@ -31,7 +66,6 @@ class EdgeResilience {
                     if (data.update.hasOwnProperty('state')) {
                         const stateStr = String(data.update.state).toLowerCase();
                         
-                        // Sync physical relay
                         await targetEntity.endpoint(1).command('genOnOff', stateStr, {}, {});
 
                         if (stateStr === 'on') {
@@ -59,17 +93,14 @@ class EdgeResilience {
                         const prevVal = this.lastBrightness[sourceName] || val;
                         const delta = Math.abs(val - prevVal);
 
-                      // GHOST PROTECTION: Block no-neutral "Reboot to 128" glitches
+                        // GHOST PROTECTION
                         if (val === 128 && delta > 10 && prevVal !== 128) {
-                            this.logger.info(`EdgeResilience: Ghost Reset detected on ${sourceName}. Ignoring and maintaining internal state at ${prevVal}.`);
-                            
-                            // CRITICAL: We do NOT send a command back to the slave here. 
-                            // We just update our memory so the Master doesn't move.
+                            this.logger.info(`EdgeResilience: Ghost detected on ${sourceName}. Maintaining ${prevVal}.`);
                             this.lastBrightness[sourceName] = prevVal; 
                             return;
                         }
 
-                        // WRAP-AROUND SHIELD: Block physical encoder jumps
+                        // WRAP-AROUND SHIELD
                         if (delta > 60) {
                             this.logger.info(`EdgeResilience: Shielded jump on ${sourceName} (${prevVal} -> ${val})`);
                             this.lastBrightness[sourceName] = val;
@@ -78,10 +109,10 @@ class EdgeResilience {
 
                         this.lastBrightness[sourceName] = val;
 
-                        // Clamping & Landing Limit
-                        if (val > 254) val = 254;
+                        // Dynamic Clamping
+                        const maxB = this.limits[sourceName] || 254;
+                        if (val > maxB) val = maxB;
                         if (val < 1) val = 1;
-                        if (sourceName === 'Landing Slave' && val > 230) val = 230;
 
                         await targetEntity.endpoint(1).command('genLevelCtrl', 'moveToLevel', {level: val, transtime: 0}, {});
                         this.logger.info(`EdgeResilience: [${targetName}] Level -> ${val}`);
