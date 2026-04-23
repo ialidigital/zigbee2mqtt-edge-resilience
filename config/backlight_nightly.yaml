@@ -1,0 +1,8 @@
+# backlight_nightly.yaml
+backlight_control:
+  night_start: 22  # 10 PM
+  night_end: 8     # 8 AM
+  monitored_lights:
+    - "Ensuite Lights"
+    - "Main Bedroom Lights"
+    - "Bathroom Lights"
