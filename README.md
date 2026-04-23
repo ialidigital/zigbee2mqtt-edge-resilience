@@ -60,9 +60,9 @@ The extension operates as a middleware layer within the Zigbee2MQTT lifecycle:
 1. Clone this repository or copy `edge-resilience.yaml` and `backlight_nightly.yaml` from the /config folder of this repo into your zigbee2mqtt/data/ folder
 
 ```yaml
-zigbee2mqtt/data/external_extensions/
-  - edge-resilience.js
-  - backlight-nightly.js
+zigbee2mqtt/data/
+  - edge-resilience.yaml
+  - backlight-nightly.yaml
 ```
 
 2. Go to Z2M Console > Settings > Dev Console > External Extensions.
