@@ -21,9 +21,11 @@ class LandingProtector {
         this.eventBus.onStateChange(this, async (data) => {
             var targetBrightness = 127; // Default to midpoint if brightness is undefined
             
+            // check for slave dimmer event origin
             if (!data || !data.entity || data.entity.name !== this.slaveName) return;
 
             const now = Date.now();
+            // ensure 1Hz cadence
             if (now - this.lastCommandTime < this.commandInterval) return;
 
             try {
@@ -40,6 +42,7 @@ class LandingProtector {
 
                 if (slaveState.brightness === undefined || slaveState.brightness === null) 
                 {
+                    this.logger.info(`[LandingProtector] slaveState.brightness undef, setting targetBrightness to ${this.brightnessMidpoint}`);
                     targetBrightness = this.brightnessMidpoint;
                 } 
                 else 
@@ -47,6 +50,7 @@ class LandingProtector {
                     targetBrightness = slaveState.brightness || this.brightnessCap;
                 }
 
+                // master value is prime
                 if (targetBrightness > masterState.brightness)
                 {                
                     targetBrightness = masterState.brightness;
@@ -55,8 +59,16 @@ class LandingProtector {
                this.logger.info(`[LandingProtector] targetBrightness: ${targetBrightness}`);
 
                 // Apply the physical safety cap or floor for the 5x Aurora R6 loop
-                if (targetBrightness > this.brightnessCap) targetBrightness = this.brightnessCap;
-                if (targetBrightness < this.brightnessFloor) targetBrightness = this.brightnessFloor;
+                if (targetBrightness > this.brightnessCap)
+                {
+                     targetBrightness = this.brightnessCap;
+                     this.logger.info(`[LandingProtector] targetBrightness was greater than cap, setting from: ${targetBrightness} to: ${this.brightnessCap}`);
+                }
+                if (targetBrightness < this.brightnessFloor)
+                {
+                     targetBrightness = this.brightnessFloor;
+                     this.logger.info(`[LandingProtector] targetBrightness was less than floor, setting from: ${targetBrightness} to: ${this.brightnessFloor}`);
+                }
 
                 // Skip if the change is negligible to reduce mesh chatter
                 let delta = Math.abs((masterState.brightness || 0) - targetBrightness);
